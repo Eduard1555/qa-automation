@@ -13,6 +13,12 @@ def test_get_existing_product(client):
 
     data = response.json()
 
+    assert set(data.keys()) == {"id", "name", "price", "stock"}
+    assert isinstance(data["id"], int)
+    assert isinstance(data["name"], str)
+    assert isinstance(data["price"], (int, float))
+    assert isinstance(data["stock"], int)
+
     assert data["id"] == 1
     assert data["name"] == "Mechanical Keyboard"
     assert data["price"] == 249.99
@@ -46,10 +52,16 @@ def test_create_product_successfully(client):
 
     data = response.json()
 
+    assert set(data.keys()) == {"id", "name", "price", "stock"}
+    assert isinstance(data["id"], int)
+    assert isinstance(data["name"], str)
+    assert isinstance(data["price"], (int, float))
+    assert isinstance(data["stock"], int)
+
     assert data["name"] == "Test Monitor"
     assert data["price"] == 599.99
     assert data["stock"] == 8
-    assert "id" in data
+    assert data["id"] > 0
 
 
 def test_create_product_with_negative_price(client):
@@ -89,6 +101,13 @@ def test_get_products_returns_seeded_products(client):
     assert products[0]["name"] == "Mechanical Keyboard"
     assert products[1]["name"] == "Gaming Mouse"
     assert products[2]["name"] == "USB-C Hub"
+
+    for product in products:
+        assert set(product.keys()) == {"id", "name", "price", "stock"}
+        assert isinstance(product["id"], int)
+        assert isinstance(product["name"], str)
+        assert isinstance(product["price"], (int, float))
+        assert isinstance(product["stock"], int)
 
 
 def test_create_product_with_empty_name(client):
