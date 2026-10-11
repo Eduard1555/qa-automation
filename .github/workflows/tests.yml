@@ -23,8 +23,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run API tests
-        run: python -m pytest -v
+      - name: Run API tests with coverage
+        run: |
+          python -m pytest --cov=main --cov-report=term-missing --cov-report=xml:coverage.xml -v
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-coverage-report
+          path: coverage.xml
+          if-no-files-found: warn
+          retention-days: 14
 
   ui-tests:
     name: UI Tests
