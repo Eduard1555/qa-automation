@@ -252,3 +252,39 @@ def test_create_product_trims_whitespace_from_name(client):
 
     assert response.status_code == 201
     assert response.json()["name"] == "Monitor"
+
+def test_create_product_with_string_price(client):
+    response = client.post(
+        "/products",
+        json={
+            "name": "Invalid Price Type",
+            "price": "not-a-number",
+            "stock": 5,
+        },
+    )
+
+    assert response.status_code == 422
+
+    
+def test_create_product_without_name(client):
+    response = client.post(
+        "/products",
+        json={
+            "price": 10.0,
+            "stock": 5,
+        },
+    )
+
+    assert response.status_code == 422
+
+def test_create_product_with_string_stock(client):
+    response = client.post(
+        "/products",
+        json={
+            "name": "Invalid Stock Type",
+            "price": 10.0,
+            "stock": "not-a-number",
+        },
+    )
+
+    assert response.status_code == 422
