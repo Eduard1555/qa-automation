@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   api-tests:
     name: API Tests
@@ -25,7 +28,13 @@ jobs:
 
       - name: Run API tests with coverage
         run: |
-          python -m pytest --cov=main --cov-report=term-missing --cov-report=xml:coverage.xml -v
+          python -m pytest \
+            --cov=main \
+            --cov=database \
+            --cov-branch \
+            --cov-report=term-missing \
+            --cov-report=xml:coverage.xml \
+            -v
 
       - name: Upload coverage report
         if: always()
@@ -35,7 +44,6 @@ jobs:
           path: coverage.xml
           if-no-files-found: warn
           retention-days: 14
-
 
   ui-tests:
     name: UI Tests
@@ -64,7 +72,7 @@ jobs:
         working-directory: frontend
         run: npm ci
 
-      - name: Install Playwright browser
+      - name: Install Playwright browsers
         working-directory: frontend
         run: npx playwright install --with-deps chromium
 
@@ -79,4 +87,15 @@ jobs:
           name: playwright-html-report
           path: frontend/playwright-report/
           if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload Playwright failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-failure-artifacts
+          path: |
+            frontend/test-results/
+            frontend/playwright-report/
+          if-no-files-found: ignore
           retention-days: 14
