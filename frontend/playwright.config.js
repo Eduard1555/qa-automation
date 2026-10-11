@@ -8,7 +8,11 @@ const pythonExecutable =
 export default defineConfig({
   testDir: "./tests",
   fullyParallel: true,
-  reporter: "list",
+
+  reporter: [
+    ["list"],
+    ["html", { outputFolder: "playwright-report", open: "never" }],
+  ],
 
   use: {
     baseURL: "http://localhost:5173",
