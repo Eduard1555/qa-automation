@@ -108,7 +108,7 @@ function App() {
         <div className="brand">
           <span className="brand-icon">Q</span>
           <span>
-            QA<span className="brand-accent">Store</span>
+            QA <span className="brand-accent">Automation</span>
           </span>
         </div>
 
