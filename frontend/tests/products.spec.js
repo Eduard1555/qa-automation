@@ -145,24 +145,33 @@ test.describe("QA Automation Dashboard", () => {
     ).toHaveCount(0);
   });
 
-  test("rejects a product name longer than 100 characters", async ({
-    page,
-  }) => {
+  test("limits the product name to 100 characters", async ({ page }) => {
     await page.goto("/");
 
-    await page
-      .getByLabel("Product name")
-      .fill("A".repeat(101));
+    const longName = `Long Name ${Date.now()} `.padEnd(101, "A");
+    const truncatedName = longName.slice(0, 100);
+
+    await page.getByLabel("Product name").fill(longName);
+
+    // maxLength=100 makes the browser drop the 101st character.
+    await expect(page.getByLabel("Product name")).toHaveValue(truncatedName);
 
     await page.getByLabel("Price (RON)").fill("49.99");
     await page.getByLabel("Stock quantity").fill("5");
 
     await page.getByRole("button", { name: "Add product" }).click();
 
-    await expect(page.getByLabel("Product name")).toHaveJSProperty(
-      "validity.valid",
-      false
+    await expect(page.getByRole("status")).toContainText(
+      `"${truncatedName}" was added to your catalog.`
     );
+
+    await expect(
+      page.getByRole("cell", { name: truncatedName, exact: true })
+    ).toBeVisible();
+
+    await expect(
+      page.getByRole("cell", { name: longName, exact: true })
+    ).toHaveCount(0);
   });
 
   test("displays the out-of-stock status", async ({ page }) => {
