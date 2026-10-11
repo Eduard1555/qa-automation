@@ -8,3 +8,6 @@ qa_automation.db
 .env
 /shopguard.db
 /qa_automation.db
+.coverage
+coverage.xml
+htmlcov/
