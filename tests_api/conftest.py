@@ -2,7 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 import database
-from main import app
+import main
 
 @pytest.fixture
 def client(tmp_path, monkeypatch):
@@ -14,7 +14,5 @@ def client(tmp_path, monkeypatch):
         test_database_path,
     )
 
-    database.initialize_database()
-
-    with TestClient(app) as test_client:
+    with TestClient(main.app) as test_client:
         yield test_client
