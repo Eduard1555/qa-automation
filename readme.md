@@ -57,7 +57,7 @@ The Playwright suite covers:
 - Creating a product successfully.
 - Rejecting missing product names.
 - Rejecting zero prices and negative stock.
-- Rejecting product names exceeding the maximum length.
+- Limiting product names to the maximum length of 100 characters.
 - Displaying out-of-stock status.
 
 ## Test Results
