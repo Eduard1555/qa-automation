@@ -1,80 +1,194 @@
+# QA Automation Demo
 
-# QA Automation
+[![QA Automation Tests](https://github.com/Eduard1555/qa-automation/actions/workflows/tests.yml/badge.svg)](https://github.com/Eduard1555/qa-automation/actions/workflows/tests.yml)
 
-A demo e-commerce API built with Python and FastAPI, designed for practicing API testing and test automation.
+A full-stack QA automation project demonstrating API testing, browser-based UI testing, test coverage, and continuous integration using Python, FastAPI, pytest, Playwright, React, and GitHub Actions.
 
-## Features
+## Project Overview
 
-- REST API for managing products
-- SQLite database with sample products
-- Product creation and retrieval
-- Input validation for product names, prices, and stock
-- Automated API tests using pytest
+This project provides a product management dashboard backed by a REST API. It is designed to demonstrate practical software testing skills through automated functional tests, negative testing, input validation, database testing, and browser automation.
+
+### Key Features
+
+- REST API built with FastAPI.
+- SQLite database with product creation and retrieval.
+- Automated API tests using pytest and FastAPI TestClient.
+- Browser-based end-to-end tests using Playwright.
+- UI validation for product search, creation, and invalid input.
+- API and frontend integration through HTTP requests.
+- Automated CI testing with GitHub Actions.
+- Code coverage reporting with pytest-cov.
 
 ## Tech Stack
 
-- Python
-- FastAPI
-- SQLite
-- pytest
-- HTTPX
+| Area | Technologies |
+|---|---|
+| Backend | Python, FastAPI |
+| Database | SQLite |
+| API Testing | pytest, TestClient, HTTPX |
+| Frontend | React, Vite, JavaScript |
+| UI Automation | Playwright |
+| Coverage | pytest-cov |
+| CI/CD | GitHub Actions |
+| Version Control | Git, GitHub |
+
+## Automated Tests
+
+### API Testing
+
+The API test suite covers:
+
+- Retrieving the product catalog.
+- Retrieving an existing product.
+- Handling nonexistent products.
+- Rejecting invalid product IDs.
+- Creating products successfully.
+- Validating product names, prices, and stock quantities.
+- Initializing the database and preventing duplicate seed data.
+- Verifying database transaction rollback.
+
+### UI Testing
+
+The Playwright suite covers:
+
+- Dashboard rendering and API connection status.
+- Loading products from the API.
+- Searching and filtering products.
+- Creating a product successfully.
+- Rejecting missing product names.
+- Rejecting zero prices and negative stock.
+- Rejecting product names exceeding the maximum length.
+- Displaying out-of-stock status.
+
+## Test Results
+
+Latest locally verified results:
+
+| Test Suite | Results |
+|---|---:|
+| API tests | 16 passed |
+| Playwright UI tests | 9 passed |
+| Total automated tests | 25 passed |
+| Backend code coverage | 97% |
+
+The reported coverage is for `main.py` and `database.py`, not the entire repository. `main.py` has 100% coverage and `database.py` has 92% coverage.
+
+GitHub Actions runs the API and UI test suites as separate jobs on pushes and pull requests.
 
 ## Getting Started
+
+### Prerequisites
+
+- Python 3.14
+- Node.js 24 and npm
+- Git
 
 ### 1. Clone the repository
 
 ```bash
-git clone YOUR_REPOSITORY_URL
+git clone https://github.com/Eduard1555/qa-automation.git
 cd qa-automation
 ```
 
-### 2. Create a virtual environment
+### 2. Set up the Python environment
 
-```bash
-python -m venv .venv
-```
-
-Activate it in Windows PowerShell:
+On Windows PowerShell:
 
 ```powershell
+python -m venv .venv
 .\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
 ```
 
-### 3. Install dependencies
+### 3. Start the API
 
-```bash
-python -m pip install -r requirements.txt
+From the project root:
+
+```powershell
+python -m uvicorn main:app --reload
 ```
 
-### 4. Run the application
+The API runs at `http://127.0.0.1:8000`.
 
-```bash
-uvicorn main:app --reload
+Interactive API documentation is available at `http://127.0.0.1:8000/docs`.
+
+### 4. Start the frontend
+
+Open a separate terminal:
+
+```powershell
+cd frontend
+npm ci
+npm run dev
 ```
 
-Open the interactive API documentation:
+Open the local URL printed by Vite, normally `http://localhost:5173`.
 
-http://127.0.0.1:8000/docs
+## Running the Tests
 
-## Running Tests
+### API tests with coverage
 
-```bash
-python -m pytest -v
+From the project root:
+
+```powershell
+python -m pytest --cov=main --cov=database --cov-report=term-missing -v
 ```
 
-## Test Coverage
+### Playwright UI tests
 
-The current test suite covers:
+From the `frontend` directory:
 
-- Retrieving existing products
-- Handling nonexistent products
-- Rejecting invalid product IDs
-- Creating products successfully
-- Rejecting negative prices and stock values
-- Validating product names
-- Accepting zero stock
-- Rejecting zero prices
+```powershell
+npx playwright install chromium
+npx playwright test
+```
 
-## Project Status
+The Playwright configuration starts the frontend and API automatically when they are not already running.
 
-The API and initial automated test suite are implemented. Browser automation and continuous integration are planned as future improvements.
+## Continuous Integration
+
+GitHub Actions automatically executes the API and UI test suites on pushes and pull requests.
+
+The API job generates terminal coverage results and a `coverage.xml` artifact. The UI job installs Chromium and executes the Playwright suite.
+
+[View workflow runs](https://github.com/Eduard1555/qa-automation/actions)
+
+## Project Structure
+
+```text
+qa-automation/
+├── .github/
+│   └── workflows/
+│       └── tests.yml
+├── frontend/
+│   ├── src/
+│   ├── tests/
+│   │   └── products.spec.js
+│   ├── package.json
+│   └── playwright.config.js
+├── tests_api/
+│   ├── conftest.py
+│   └── test_products.py
+├── database.py
+├── main.py
+├── pytest.ini
+├── requirements.txt
+└── readme.md
+```
+
+## Purpose
+
+This project demonstrates practical skills in:
+
+- Writing maintainable automated tests.
+- Testing REST APIs and HTTP responses.
+- Validating user input and error handling.
+- Testing database initialization and transaction behavior.
+- Automating browser interactions with Playwright.
+- Measuring code coverage.
+- Integrating automated tests into a CI pipeline.
+
+---
+
+**Repository:** [github.com/Eduard1555/qa-automation](https://github.com/Eduard1555/qa-automation)
