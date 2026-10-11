@@ -1,8 +1,9 @@
 from contextlib import asynccontextmanager
+from typing import Annotated
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, StringConstraints
 
 from database import get_connection, initialize_database
 
@@ -32,8 +33,18 @@ app.add_middleware(
 )
 
 
+ProductName = Annotated[
+    str,
+    StringConstraints(
+        strip_whitespace=True,
+        min_length=1,
+        max_length=100,
+    ),
+]
+
+
 class ProductCreate(BaseModel):
-    name: str = Field(min_length=1, max_length=100)
+    name: ProductName
     price: float = Field(gt=0)
     stock: int = Field(ge=0)
 

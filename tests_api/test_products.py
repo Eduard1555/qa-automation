@@ -225,3 +225,30 @@ def test_health_endpoint(client):
 
     assert response.status_code == 200
     assert response.json() == {"status": "healthy"}
+
+
+def test_create_product_with_whitespace_only_name(client):
+    response = client.post(
+        "/products",
+        json={
+            "name": "   ",
+            "price": 49.99,
+            "stock": 5,
+        },
+    )
+
+    assert response.status_code == 422
+
+    
+def test_create_product_trims_whitespace_from_name(client):
+    response = client.post(
+        "/products",
+        json={
+            "name": "   Monitor   ",
+            "price": 499.99,
+            "stock": 10,
+        },
+    )
+
+    assert response.status_code == 201
+    assert response.json()["name"] == "Monitor"
