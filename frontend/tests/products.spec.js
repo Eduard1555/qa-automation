@@ -1,5 +1,13 @@
 import { test, expect } from "@playwright/test";
 
+async function countProductRows(page) {
+  await expect(
+    page.getByRole("cell", { name: "Mechanical Keyboard" })
+  ).toBeVisible();
+
+  return page.locator("tbody tr").count();
+}
+
 test.describe("QA Automation Dashboard", () => {
   test("displays the dashboard and API connection", async ({ page }) => {
     await page.goto("/");
@@ -76,6 +84,8 @@ test.describe("QA Automation Dashboard", () => {
   test("rejects a missing product name", async ({ page }) => {
     await page.goto("/");
 
+    const rowCountBefore = await countProductRows(page);
+
     await page.getByLabel("Price (RON)").fill("49.99");
     await page.getByLabel("Stock quantity").fill("5");
 
@@ -85,10 +95,14 @@ test.describe("QA Automation Dashboard", () => {
       "validity.valid",
       false
     );
+
+    await expect(page.locator("tbody tr")).toHaveCount(rowCountBefore);
   });
 
   test("rejects a zero price", async ({ page }) => {
     await page.goto("/");
+
+    const rowCountBefore = await countProductRows(page);
 
     await page.getByLabel("Product name").fill("Invalid Price Product");
     await page.getByLabel("Price (RON)").fill("0");
@@ -100,10 +114,18 @@ test.describe("QA Automation Dashboard", () => {
       "validity.valid",
       false
     );
+
+    await expect(page.locator("tbody tr")).toHaveCount(rowCountBefore);
+
+    await expect(
+      page.getByRole("cell", { name: "Invalid Price Product" })
+    ).toHaveCount(0);
   });
 
   test("rejects a negative stock quantity", async ({ page }) => {
     await page.goto("/");
+
+    const rowCountBefore = await countProductRows(page);
 
     await page.getByLabel("Product name").fill("Invalid Stock Product");
     await page.getByLabel("Price (RON)").fill("49.99");
@@ -115,6 +137,12 @@ test.describe("QA Automation Dashboard", () => {
       "validity.valid",
       false
     );
+
+    await expect(page.locator("tbody tr")).toHaveCount(rowCountBefore);
+
+    await expect(
+      page.getByRole("cell", { name: "Invalid Stock Product" })
+    ).toHaveCount(0);
   });
 
   test("rejects a product name longer than 100 characters", async ({
