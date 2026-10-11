@@ -11,3 +11,6 @@ qa_automation.db
 .coverage
 coverage.xml
 htmlcov/
+# Playwright test artifacts
+test-results/
+frontend/test-results/
