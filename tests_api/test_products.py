@@ -1,4 +1,8 @@
+import os
 import sqlite3
+import subprocess
+import sys
+from pathlib import Path
 
 import database
 
@@ -209,7 +213,7 @@ def test_get_connection_rolls_back_and_closes_on_error(
 
     assert item_count == 0
 
-    
+
 def test_home_endpoint(client):
     response = client.get("/")
 
@@ -239,7 +243,7 @@ def test_create_product_with_whitespace_only_name(client):
 
     assert response.status_code == 422
 
-    
+
 def test_create_product_trims_whitespace_from_name(client):
     response = client.post(
         "/products",
@@ -253,6 +257,7 @@ def test_create_product_trims_whitespace_from_name(client):
     assert response.status_code == 201
     assert response.json()["name"] == "Monitor"
 
+
 def test_create_product_with_string_price(client):
     response = client.post(
         "/products",
@@ -265,7 +270,7 @@ def test_create_product_with_string_price(client):
 
     assert response.status_code == 422
 
-    
+
 def test_create_product_without_name(client):
     response = client.post(
         "/products",
@@ -276,6 +281,7 @@ def test_create_product_without_name(client):
     )
 
     assert response.status_code == 422
+
 
 def test_create_product_with_string_stock(client):
     response = client.post(
@@ -288,3 +294,39 @@ def test_create_product_with_string_stock(client):
     )
 
     assert response.status_code == 422
+
+
+def test_database_script_initializes_database(tmp_path):
+    project_root = Path(__file__).resolve().parent.parent
+    database_script = project_root / "database.py"
+    temporary_database = tmp_path / "script_test.db"
+
+    environment = os.environ.copy()
+    environment["QA_DATABASE_PATH"] = str(temporary_database)
+
+    result = subprocess.run(
+        [sys.executable, str(database_script)],
+        cwd=tmp_path,
+        env=environment,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0
+    assert str(temporary_database) in result.stdout
+    assert temporary_database.exists()
+
+    connection = sqlite3.connect(temporary_database)
+
+    try:
+        products = connection.execute(
+            "SELECT name, price, stock FROM products ORDER BY id"
+        ).fetchall()
+    finally:
+        connection.close()
+
+    assert len(products) == 3
+    assert products[0] == ("Mechanical Keyboard", 249.99, 15)
+    assert products[1] == ("Gaming Mouse", 129.99, 30)
+    assert products[2] == ("USB-C Hub", 89.99, 0)

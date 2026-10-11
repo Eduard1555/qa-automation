@@ -1,8 +1,15 @@
+import os
 import sqlite3
 from contextlib import contextmanager
 from pathlib import Path
 
-DATABASE_PATH = Path(__file__).parent / "qa_automation.db"
+DATABASE_PATH = Path(
+    os.environ.get(
+        "QA_DATABASE_PATH",
+        Path(__file__).parent / "qa_automation.db",
+    )
+)
+
 
 @contextmanager
 def get_connection():
