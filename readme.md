@@ -1,4 +1,5 @@
-# ShopGuard QA
+
+# QA Automation
 
 A demo e-commerce API built with Python and FastAPI, designed for practicing API testing and test automation.
 
@@ -24,16 +25,16 @@ A demo e-commerce API built with Python and FastAPI, designed for practicing API
 
 ```bash
 git clone YOUR_REPOSITORY_URL
-cd shopguard-qa
+cd qa-automation
 ```
 
-### 2. Create and activate a virtual environment
+### 2. Create a virtual environment
 
 ```bash
 python -m venv .venv
 ```
 
-Windows PowerShell:
+Activate it in Windows PowerShell:
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
@@ -51,7 +52,7 @@ python -m pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
-Open the interactive API documentation at:
+Open the interactive API documentation:
 
 http://127.0.0.1:8000/docs
 
@@ -61,8 +62,19 @@ http://127.0.0.1:8000/docs
 python -m pytest -v
 ```
 
-The test suite covers successful requests, missing products, invalid product IDs, input validation, and product listing.
+## Test Coverage
+
+The current test suite covers:
+
+- Retrieving existing products
+- Handling nonexistent products
+- Rejecting invalid product IDs
+- Creating products successfully
+- Rejecting negative prices and stock values
+- Validating product names
+- Accepting zero stock
+- Rejecting zero prices
 
 ## Project Status
 
-The API and initial automated test suite are implemented. Additional testing and browser automation will be added as the project evolves.
+The API and initial automated test suite are implemented. Browser automation and continuous integration are planned as future improvements.

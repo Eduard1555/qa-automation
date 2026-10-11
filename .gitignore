@@ -3,6 +3,8 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .test-tmp/
-shopguard.db
+qa_automation.db
 *.db-journal
 .env
+/shopguard.db
+/qa_automation.db

@@ -12,8 +12,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="ShopGuard QA",
-    description="A demo e-commerce application built for QA automation practice.",
+    title="QA Automation",
+    description="A demo API for practicing software testing and automation.",
     version="0.2.0",
     lifespan=lifespan,
 )
@@ -37,7 +37,7 @@ def row_to_product(row):
 @app.get("/")
 def home():
     return {
-        "message": "Welcome to ShopGuard QA!",
+        "message": "Welcome to the QA Automation API!",
         "status": "running",
     }
 

@@ -7,7 +7,7 @@ from main import app
 
 @pytest.fixture
 def client(tmp_path, monkeypatch):
-    test_database_path = tmp_path / "test_shopguard.db"
+    test_database_path = tmp_path / "test_qa_automation.db"
 
     monkeypatch.setattr(
         database,
