@@ -1,10 +1,4 @@
-from fastapi.testclient import TestClient
-
-from main import app
-
-client = TestClient(app)
-
-def test_get_existing_product():
+def test_get_existing_product(client):
     response = client.get("/products/1")
 
     assert response.status_code == 200
@@ -17,21 +11,20 @@ def test_get_existing_product():
     assert data["stock"] == 15
 
 
-
-def test_get_nonexistent_product():
+def test_get_nonexistent_product(client):
     response = client.get("/products/999")
 
     assert response.status_code == 404
     assert response.json() == {"detail": "Product not found"}
 
 
-def test_get_product_with_invalid_id():
+def test_get_product_with_invalid_id(client):
     response = client.get("/products/abc")
 
     assert response.status_code == 422
 
 
-def test_create_product_successfully():
+def test_create_product_successfully(client):
     response = client.post(
         "/products",
         json={
@@ -51,7 +44,7 @@ def test_create_product_successfully():
     assert "id" in data
 
 
-def test_create_product_with_negative_price():
+def test_create_product_with_negative_price(client):
     response = client.post(
         "/products",
         json={
@@ -64,7 +57,7 @@ def test_create_product_with_negative_price():
     assert response.status_code == 422
 
 
-def test_create_product_with_negative_stock():
+def test_create_product_with_negative_stock(client):
     response = client.post(
         "/products",
         json={
