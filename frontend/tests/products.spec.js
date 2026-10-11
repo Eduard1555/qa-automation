@@ -73,8 +73,58 @@ test.describe("QA Automation Dashboard", () => {
     ).toBeVisible();
   });
 
-  test("requires a product name", async ({ page }) => {
+  test("rejects a missing product name", async ({ page }) => {
     await page.goto("/");
+
+    await page.getByLabel("Price (RON)").fill("49.99");
+    await page.getByLabel("Stock quantity").fill("5");
+
+    await page.getByRole("button", { name: "Add product" }).click();
+
+    await expect(page.getByLabel("Product name")).toHaveJSProperty(
+      "validity.valid",
+      false
+    );
+  });
+
+  test("rejects a zero price", async ({ page }) => {
+    await page.goto("/");
+
+    await page.getByLabel("Product name").fill("Invalid Price Product");
+    await page.getByLabel("Price (RON)").fill("0");
+    await page.getByLabel("Stock quantity").fill("5");
+
+    await page.getByRole("button", { name: "Add product" }).click();
+
+    await expect(page.getByLabel("Price (RON)")).toHaveJSProperty(
+      "validity.valid",
+      false
+    );
+  });
+
+  test("rejects a negative stock quantity", async ({ page }) => {
+    await page.goto("/");
+
+    await page.getByLabel("Product name").fill("Invalid Stock Product");
+    await page.getByLabel("Price (RON)").fill("49.99");
+    await page.getByLabel("Stock quantity").fill("-1");
+
+    await page.getByRole("button", { name: "Add product" }).click();
+
+    await expect(page.getByLabel("Stock quantity")).toHaveJSProperty(
+      "validity.valid",
+      false
+    );
+  });
+
+  test("rejects a product name longer than 100 characters", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    await page
+      .getByLabel("Product name")
+      .fill("A".repeat(101));
 
     await page.getByLabel("Price (RON)").fill("49.99");
     await page.getByLabel("Stock quantity").fill("5");

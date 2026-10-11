@@ -1,3 +1,7 @@
+import sqlite3
+
+import database
+
 def test_get_existing_product(client):
     response = client.get("/products/1")
 
@@ -136,3 +140,88 @@ def test_create_product_with_name_too_long(client):
     )
 
     assert response.status_code == 422
+
+
+def test_initialize_database_seeds_empty_database(tmp_path, monkeypatch):
+    test_database_path = tmp_path / "new_database.db"
+    monkeypatch.setattr(database, "DATABASE_PATH", test_database_path)
+
+    database.initialize_database()
+
+    with database.get_connection() as connection:
+        products = connection.execute(
+            "SELECT name, price, stock FROM products ORDER BY id"
+        ).fetchall()
+
+    assert len(products) == 3
+    assert products[0]["name"] == "Mechanical Keyboard"
+    assert products[1]["name"] == "Gaming Mouse"
+    assert products[2]["name"] == "USB-C Hub"
+
+
+def test_initialize_database_does_not_duplicate_seeded_products(
+    tmp_path, monkeypatch
+):
+    test_database_path = tmp_path / "existing_database.db"
+    monkeypatch.setattr(database, "DATABASE_PATH", test_database_path)
+
+    database.initialize_database()
+    database.initialize_database()
+
+    with database.get_connection() as connection:
+        product_count = connection.execute(
+            "SELECT COUNT(*) FROM products"
+        ).fetchone()[0]
+
+    assert product_count == 3
+
+
+def test_get_connection_rolls_back_and_closes_on_error(
+    tmp_path, monkeypatch
+):
+    test_database_path = tmp_path / "rollback_database.db"
+    monkeypatch.setattr(database, "DATABASE_PATH", test_database_path)
+
+    with database.get_connection() as connection:
+        connection.execute(
+            """
+            CREATE TABLE test_items (
+                id INTEGER PRIMARY KEY,
+                name TEXT NOT NULL
+            )
+            """
+        )
+
+    try:
+        with database.get_connection() as connection:
+            connection.execute(
+                "INSERT INTO test_items (name) VALUES (?)",
+                ("Temporary item",),
+            )
+            raise ValueError("Simulated failure")
+    except ValueError as error:
+        assert str(error) == "Simulated failure"
+
+    with database.get_connection() as connection:
+        item_count = connection.execute(
+            "SELECT COUNT(*) FROM test_items"
+        ).fetchone()[0]
+
+    assert item_count == 0
+
+    
+def test_home_endpoint(client):
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "message": "Welcome to the QA Automation API!",
+        "status": "running",
+    }
+
+
+def test_health_endpoint(client):
+    response = client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json() == {"status": "healthy"}
